@@ -10,8 +10,8 @@ const client = new Redis({
 });
 
 const clientQueue = new Redis({
-  host: process.env.REDIS_MAIN_HOST || "localhost",
-  port: process.env.REDIS_MAIN_PORT || 6380,
+  host: process.env.REDIS_Queue_HOST || "localhost",
+  port: process.env.REDIS_Queue_PORT || 6380,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
 });
