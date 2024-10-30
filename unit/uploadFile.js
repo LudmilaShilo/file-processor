@@ -1,5 +1,6 @@
 require("../config.js");
 const multer = require("multer");
+const fs = require("fs");
 
 const fileSizeInMB = parseInt(process.env.fileSizeInMB, 10);
 

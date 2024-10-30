@@ -5,6 +5,7 @@ const { Transform } = require("stream");
 const constants = require("../constants");
 const Redis = require("../redis");
 const File = require("../models/fileModel");
+const { clients } = require("../controllers/statusController");
 console.log("services/taskWorker.js start");
 
 // Функція для обробки даних за допомогою потоків
@@ -66,6 +67,15 @@ const processData = (data) => {
         constants.status.completed
       );
       console.log("in taskWorker Redis change status on completed");
+      if (clients[userId]) {
+        clients[userId].write(
+          `data: ${JSON.stringify({
+            fileName,
+            task,
+            status: constants.status.failed,
+          })}\n\n`
+        );
+      }
       parentPort.postMessage({
         status: "completed",
         message: "File processed successfully.",
