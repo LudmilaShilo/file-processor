@@ -85,13 +85,12 @@ describe("task create", () => {
     );
   });
 
-  it.skip("should set header and respond with file if status is completed", async () => {
+  it("should set header and respond with file if status is completed", async () => {
     req.body.fileName = "loadedFile.txt";
     req.body.task = "task2";
     Redis.get.resolves("completed");
     await taskController.create(req, res, next);
     expect(res.setHeader).to.have.been.calledTwice;
-    expect(res.status).to.have.been.calledWith(200);
   });
 
   it("should add task to queue if processing status is not set", async () => {

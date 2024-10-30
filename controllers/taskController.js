@@ -32,11 +32,8 @@ const create = catchAsync(async (req, res, next) => {
 
   if (status === constants.status.completed) {
     // Якщо файл вже оброблений, завантажуємо його
-    const fileStream = getFileStream({ userId, fileName, result });
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${fileWithResult}"`
-    );
+    const fileStream = getFileStream({ userId, fileName, task });
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
     res.setHeader("Content-Type", "application/octet-stream");
     fileStream.pipe(res);
     return; // Завершуємо виконання функції
@@ -128,4 +125,4 @@ const getStatus = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getStatus, returnResult, create };
+module.exports = { getStatus, returnResult, create, getProcessingData };
