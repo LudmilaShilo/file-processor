@@ -1,11 +1,12 @@
-const constants = require("../constants");
-const Redis = require("../redis");
+const AppError = require("../unit/appError");
 
-console.log(`${constants.status.pending}`);
+class AppErrorMock {
+  constructor(message, statusCode) {
+    this.statusCode = this.statusCode || 500;
+    this.message = message;
+  }
+}
 
-Redis.put(`test`, constants.status.pending);
+const error = new AppErrorMock("Ok", 200);
 
-(async () => {
-  const value = await Redis.get(`test`);
-  console.log(`${value}`);
-})();
+console.log(error);
