@@ -84,45 +84,4 @@ const returnResult = catchAsync(async (req, res, next) => {
   return;
 });
 
-const getProcessingData = async (userId) => {
-  let cursor = "0";
-  const allData = [];
-
-  do {
-    const result = await Redis.client.scan(
-      cursor,
-      "MATCH",
-      `processing:${userId}:*:*`
-    );
-    cursor = result[0]; // Оновлюємо курсор
-    const keys = result[1]; // Отримуємо знайдені ключі
-
-    // Отримуємо значення для кожного ключа
-    if (keys.length > 0) {
-      const values = await Redis.client.mget(keys);
-      values.forEach((value, index) => {
-        if (value) {
-          console.log("value", `${value}`);
-          allData.push({
-            fileName: keys[index].split(":")[2],
-            task: keys[index].split(":")[3],
-            status: value.split('"')[1],
-          });
-        }
-      });
-    }
-  } while (cursor !== "0"); // Продовжуємо, поки курсор не повернеться до нуля
-
-  return allData; // Повертаємо всі зібрані дані
-};
-
-const getStatus = catchAsync(async (req, res, next) => {
-  const userId = req.user.toObject()._id;
-  const data = await getProcessingData(userId);
-  res.status(200).json({
-    status: "success",
-    data,
-  });
-});
-
-module.exports = { getStatus, returnResult, create, getProcessingData };
+module.exports = { returnResult, create };

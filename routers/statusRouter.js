@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authController.protect);
 router.use(authController.restrictTo(plans.ProUpload));
 
+router.route("/").get(statusController.getStatus);
 router.route("/updates").get(statusController.SSEconnector);
 
 module.exports = router;

@@ -11,6 +11,4 @@ router.use(authController.restrictTo(plans.ProUpload));
 
 router.route("/").post(taskController.create).get(taskController.returnResult);
 
-router.route("/status").get(taskController.getStatus);
-
 module.exports = router;
