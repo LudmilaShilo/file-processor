@@ -3,14 +3,13 @@ let sinon;
 let sinonChai;
 let chai;
 let fileController;
-//const fileController = require("../../controllers/fileController");
-// console.log("fileController keys", Object.keys(fileController));
 const File = require("../../models/fileModel");
 const AppError = require("../../unit/appError");
 const AppErrorMock = require("../mocks/AppError");
+const uploadFilePromiseMock = require("../mocks/uploadFilePromise");
 const proxyquire = require("proxyquire");
 
-describe("uploadFile test", () => {
+describe("uploadFile", () => {
   let req, res, next, uploadFilePromiseStub, findOneAndUpdateStub;
 
   before(async () => {
@@ -23,29 +22,11 @@ describe("uploadFile test", () => {
     chaiModule.use(sinonChai);
     expect = chaiModule.expect;
 
-    // Stubbing dependencies
-    const uploadFilePromiseMock = (req, res) => {
-      console.log("in uploadFilePromiseMock");
-      return new Promise((resolve, reject) => {
-        console.log("in uploadFilePromiseMock promise start");
-        if (req.file?.originalname) {
-          return resolve(req.file);
-        }
-        if (!req.file) {
-          const error = new Error("No file uploaded. Please upload a file.");
-          error.statusCode = 400;
-          return reject(error);
-        }
-        const error = new Error("The file exceeds the allowed size");
-        error.statusCode = 413;
-        reject(error);
-      });
-    };
     findOneAndUpdateStub = sinon.stub(File, "findOneAndUpdate").resolves();
 
-    // Заміняємо модуль
     fileController = proxyquire("../../controllers/fileController", {
       "../unit/uploadFile.js": uploadFilePromiseMock,
+      "../unit/appError.js": AppErrorMock,
     });
   });
 
@@ -59,7 +40,7 @@ describe("uploadFile test", () => {
   });
 
   afterEach(() => {
-    sinon.restore(); // Restores original methods and clears mocks
+    sinon.restore();
   });
 
   it("should upload a file and respond with success if file upload is successful", async () => {
@@ -78,63 +59,44 @@ describe("uploadFile test", () => {
     ).to.be.true;
   });
 
-  it.skip("should call next with an AppError if no file is uploaded", async () => {
+  it("should call next with an AppError if no file is uploaded", async () => {
     req = {
       user: { id: "testUserId" },
     };
 
-    if (res.status.called) {
-      console.log("res.status value:", res.status.firstCall.args[0]);
-    } else {
-      console.log("res.status was not called.");
-    }
-
-    if (res.json.called) {
-      console.log("res.json value:", res.json.firstCall.args[0]);
-    } else {
-      console.log("res.json was not called.");
-    }
-
     await fileController.uploadFile(req, res, next);
 
     expect(next.calledOnce).to.be.true;
-    expect(next.firstCall.args[0]).to.be.an.instanceOf(AppError);
+    expect(next.firstCall.args[0].statusCode).to.equal(400);
     expect(next.firstCall.args[0].message).to.equal(
       "No file uploaded. Please upload a file."
     );
   });
 
-  it.skip("should call next with a 413 AppError if file size limit exceeded", async () => {
-    const error = new Error("The file exceeds the allowed size");
-    error.code = "LIMIT_FILE_SIZE";
-    uploadFilePromiseStub.rejects(error);
+  it("should call next with a 413 AppError if file size limit exceeded", async () => {
+    req = {
+      user: { id: "testUserId" },
+      file: { originalname: "tooBigFile.txt" },
+    };
 
     await fileController.uploadFile(req, res, next);
 
-    if (res.status.called) {
-      console.log("res.status value:", res.status.firstCall.args[0]);
-    } else {
-      console.log("res.status was not called.");
-    }
-
-    if (res.json.called) {
-      console.log("res.json value:", res.json.firstCall.args[0]);
-    } else {
-      console.log("res.json was not called.");
-    }
-
     expect(next.calledOnce).to.be.true;
-    //expect(next.firstCall.args[0]).to.be.an.instanceOf(AppError);
-    //expect(next.firstCall.args[0].statusCode).to.equal(413);
+    expect(next.firstCall.args[0].statusCode).to.equal(413);
+    expect(next.firstCall.args[0].message).to.equal(
+      "The file exceeds the allowed size"
+    );
   });
 
-  it.skip("should call next with a 500 AppError if there is another upload error", async () => {
-    uploadFilePromiseStub.rejects(new Error("General error"));
-
+  it("should call next with a 500 AppError if there is another upload error", async () => {
+    req = {
+      user: { id: "testUserId" },
+      file: "file",
+    };
     await fileController.uploadFile(req, res, next);
 
     expect(next.calledOnce).to.be.true;
-    expect(next.firstCall.args[0]).to.be.an.instanceOf(AppError);
     expect(next.firstCall.args[0].statusCode).to.equal(500);
+    expect(next.firstCall.args[0].message).to.equal("File upload error");
   });
 });
