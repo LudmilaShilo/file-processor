@@ -31,29 +31,24 @@ const create = catchAsync(async (req, res, next) => {
   const status = await Redis.get(`processing:${userId}:${fileName}:${task}`);
 
   if (status === constants.status.completed) {
-    // Якщо файл вже оброблений, завантажуємо його
     const fileStream = getFileStream({ userId, fileName, task });
     res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
     res.setHeader("Content-Type", "application/octet-stream");
     fileStream.pipe(res);
-    return; // Завершуємо виконання функції
+    return;
   }
-  // якщо задача вже в обробці - нічого не робимо
   if (status && status !== constants.status.failed) {
     return res.status(200).json({
       status: "success",
     });
   }
 
-  // додаємо в обробку
   Redis.put(
     `processing:${userId}:${fileName}:${task}`,
     constants.status.pending
   );
 
   await tasksQueue.add({ task, fileName, userId });
-  const jobCounts = await tasksQueue.getJobCounts();
-  console.log("Job Counts:", jobCounts);
   res.status(200).json({
     status: "success",
   });

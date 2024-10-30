@@ -30,15 +30,13 @@ const getProcessingData = async (userId) => {
       "MATCH",
       `processing:${userId}:*:*`
     );
-    cursor = result[0]; // Оновлюємо курсор
-    const keys = result[1]; // Отримуємо знайдені ключі
+    cursor = result[0];
+    const keys = result[1];
 
-    // Отримуємо значення для кожного ключа
     if (keys.length > 0) {
       const values = await Redis.client.mget(keys);
       values.forEach((value, index) => {
         if (value) {
-          console.log("value", `${value}`);
           allData.push({
             fileName: keys[index].split(":")[2],
             task: keys[index].split(":")[3],
@@ -47,9 +45,9 @@ const getProcessingData = async (userId) => {
         }
       });
     }
-  } while (cursor !== "0"); // Продовжуємо, поки курсор не повернеться до нуля
+  } while (cursor !== "0");
 
-  return allData; // Повертаємо всі зібрані дані
+  return allData;
 };
 
 const getStatus = catchAsync(async (req, res, next) => {

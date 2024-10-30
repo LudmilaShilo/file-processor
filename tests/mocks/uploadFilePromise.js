@@ -10,7 +10,6 @@ const uploadFilePromiseMock = (req, res) => {
       return resolve(req.file);
     }
     if (!req.file) {
-      console.log("in if !req.file");
       return resolve(null);
     }
     const error = new Error("File upload error");
