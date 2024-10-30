@@ -4,25 +4,15 @@ const AppError = require("../unit/appError.js");
 const File = require("../models/fileModel.js");
 const Redis = require("../redis.js");
 const tasksQueue = require("../queue.js");
+const getFileStream = require("../unit/getFileStream.js");
 const path = require("path");
 const fs = require("fs");
-
-const getFileStream = ({ userId, fileName, task }) => {
-  const filePath = path.join(
-    __dirname,
-    `../fileStorage/${userId}/${task}/${fileName}`
-  );
-  if (!fs.existsSync(filePath)) {
-    throw new Error("File not found");
-  }
-  return fs.createReadStream(filePath);
-};
 
 const isProcessingSupported = (task) => {
   return !!constants.tasks[task];
 };
 
-exports.create = catchAsync(async (req, res, next) => {
+const create = catchAsync(async (req, res, next) => {
   if (!req.body?.task || !req.body?.fileName) {
     return next(new AppError("Send task and file's name", 400));
   }
@@ -40,7 +30,7 @@ exports.create = catchAsync(async (req, res, next) => {
     return next(new AppError("File didn't upload. Upload file at first.", 400));
   const status = await Redis.get(`processing:${userId}:${fileName}:${task}`);
 
-  if (status === constants.tasks.completed) {
+  if (status === constants.status.completed) {
     // Якщо файл вже оброблений, завантажуємо його
     const fileStream = getFileStream({ userId, fileName, result });
     res.setHeader(
@@ -72,7 +62,7 @@ exports.create = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.returnResult = catchAsync(async (req, res, next) => {
+const returnResult = catchAsync(async (req, res, next) => {
   if (!req.query?.task || !req.query?.fileName) {
     return next(new AppError("Send task and file's name", 400));
   }
@@ -129,7 +119,7 @@ const getProcessingData = async (userId) => {
   return allData; // Повертаємо всі зібрані дані
 };
 
-exports.getStatus = catchAsync(async (req, res, next) => {
+const getStatus = catchAsync(async (req, res, next) => {
   const userId = req.user.toObject()._id;
   const data = await getProcessingData(userId);
   res.status(200).json({
@@ -137,3 +127,5 @@ exports.getStatus = catchAsync(async (req, res, next) => {
     data,
   });
 });
+
+module.exports = { getStatus, returnResult, create };

@@ -1,7 +1,6 @@
 let expect;
 let sinon;
 let sinonChai;
-let chai;
 let fileController;
 const File = require("../../models/fileModel");
 const AppError = require("../../unit/appError");
@@ -10,7 +9,7 @@ const uploadFilePromiseMock = require("../mocks/uploadFilePromise");
 const proxyquire = require("proxyquire");
 
 describe("uploadFile", () => {
-  let req, res, next, uploadFilePromiseStub, findOneAndUpdateStub;
+  let req, res, next, findOneAndUpdateStub;
 
   before(async () => {
     const chaiModule = await import("chai");
@@ -59,7 +58,7 @@ describe("uploadFile", () => {
     ).to.be.true;
   });
 
-  it("should call next with an AppError if no file is uploaded", async () => {
+  it("should call next with an error if no file is uploaded", async () => {
     req = {
       user: { id: "testUserId" },
     };
@@ -73,7 +72,7 @@ describe("uploadFile", () => {
     );
   });
 
-  it("should call next with a 413 AppError if file size limit exceeded", async () => {
+  it("should call next with a 413 error if file size limit exceeded", async () => {
     req = {
       user: { id: "testUserId" },
       file: { originalname: "tooBigFile.txt" },
@@ -88,7 +87,7 @@ describe("uploadFile", () => {
     );
   });
 
-  it("should call next with a 500 AppError if there is another upload error", async () => {
+  it("should call next with a 500 error if there is another upload error", async () => {
     req = {
       user: { id: "testUserId" },
       file: "file",
