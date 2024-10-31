@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon index.js",
     "prod": "NODE_ENV=production nodemon index.js",
-    "test": "mocha tests/unit/*.spec.js"
+    "test": "mocha tests/unit/*.*.spec.js"
   },
   "keywords": [],
   "author": "",

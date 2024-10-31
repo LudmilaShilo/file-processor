@@ -7,7 +7,6 @@ const fileController = require("../controllers/fileController.js");
 const router = express.Router();
 
 router.use(authController.protect);
-router.use(authController.restrictTo(plans.ProUpload));
 
 router.route("/").post(fileController.uploadFile);
 

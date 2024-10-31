@@ -87,7 +87,6 @@ userSchema.methods.isPasswordChanged = function (tokenCreated) {
 
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
-  // we create new value in the document. To save it in the document we need use save method
   this.resetToken = crypto
     .createHmac("sha512", process.env.CRYPTO_KEY)
     .update(resetToken)

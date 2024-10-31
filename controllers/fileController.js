@@ -12,6 +12,7 @@ const uploadFile = catchAsync(async (req, res, next) => {
   try {
     uploadedFile = await uploadFilePromise(req, res);
   } catch (err) {
+    console.log(err);
     if (err.code === "LIMIT_FILE_SIZE") {
       return next(new AppError("The file exceeds the allowed size", 413));
     }

@@ -1,8 +1,6 @@
 const Queue = require("bull");
 const Redis = require("./redis");
 
-console.log("queue.js start");
-
 const tasksQueue = new Queue("tasksQueue", {
   createClient: function (type) {
     switch (type) {
@@ -15,5 +13,7 @@ const tasksQueue = new Queue("tasksQueue", {
     }
   },
 });
+
+console.log("Queue start");
 
 module.exports = tasksQueue;

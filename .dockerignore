@@ -1,0 +1,4 @@
+**/fileStorage/
+**/node_modules/
+**/tests/
+.git

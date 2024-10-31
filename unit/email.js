@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs/promises");
 const path = require("path");
-const { fileURLToPath } = require("url");
 const { convert } = require("html-to-text");
 require("../config.js");
 
@@ -40,8 +39,8 @@ module.exports = class Email {
     );
 
     const mailOptions = {
-      from: this.from, // sender address
-      to: this.to, // list of receivers
+      from: this.from,
+      to: this.to,
       subject,
       html,
       text: convert(html, { wordwrap: 130 }),

@@ -43,17 +43,14 @@ exports.signUp = catchAsync(async (req, res) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  // check if req.body has email and password
   const { email, password } = req.body;
   if (!email || !password) {
     return next(new AppError("Pls, provide email and password", 400));
   }
-  // check if user exist and password correct
   const user = await User.findOne({ email }).select("password");
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Email or password incorrect", 401));
   }
-  // create and send token
   createSendToken(user, 200, res);
 });
 
@@ -68,7 +65,6 @@ exports.logout = (req, res) => {
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
-  // check if token exist in headers
   const headers = req.headers;
   let token;
   if (headers.authorization?.startsWith("Bearer")) {
@@ -83,10 +79,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // check is token valid
-
   const decoder = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  // ckeck if user exist
   const currentUser = await User.findById(decoder.id);
   if (!currentUser) {
     return next(new AppError("The user does not exists", 404));
@@ -106,7 +100,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  // check if token exist in cookies
   if (!req.cookies.jwt) {
     return next();
   }
@@ -122,7 +115,6 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
     return next();
   }
 
-  // check if user exist
   const currentUser = await User.findById(decoder.id);
   if (!currentUser) {
     return next();
@@ -138,17 +130,7 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.restrictTo = function (...plans) {
-  return function (req, res, next) {
-    if (!plans.includes(req.user.toObject().plan)) {
-      next(new AppError("Permission denied", 403));
-    }
-    next();
-  };
-};
-
 exports.forgotPassword = catchAsync(async function (req, res, next) {
-  // find user by email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     next(new AppError("No user with this email", 404));
@@ -193,21 +175,16 @@ exports.resetPassword = catchAsync(async function (req, res, next) {
   user.resetToken = undefined;
   user.resetTokenExpired = undefined;
   await user.save();
-  // send new token to the client
   createSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async function (req, res, next) {
-  // 1) find the user
   const user = req.user;
-  // 2) check if posted password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
     return next(new AppError("The password is not correct. Try again", 401));
   }
-  // 3) save the new password
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
-  // 4) login user and send jwt token to user
   createSendToken(user, 200, res);
 });

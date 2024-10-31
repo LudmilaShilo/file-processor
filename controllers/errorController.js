@@ -18,10 +18,7 @@ const sendProdErr = (err, req, res) => {
       message: err.message,
     });
   }
-
   // Others errors
-
-  // log error
   console.error("ERROR>>>>>", err);
   // send a message to a client
   return res.status(500).render({

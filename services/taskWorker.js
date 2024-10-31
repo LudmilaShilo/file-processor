@@ -34,7 +34,6 @@ const processData = async (data) => {
     }
   });
 
-  // Отримуємо дані про стан з Redis
   const retryKey = `retries:${userId}:${fileName}:${task}`;
   const retry = await Redis.get(retryKey);
   let attempts = retry ? JSON.parse(retry).attempts : 0;
@@ -58,15 +57,14 @@ const processData = async (data) => {
     return;
   }
 
-  let isTimedOut = false; // Флаг для контролю таймауту
+  let isTimedOut = false;
 
   setTimeout(() => {
-    isTimedOut = true; // Встановлюємо флаг, якщо таймер спрацьовує
+    isTimedOut = true;
   }, TIME_LIMIT);
 
   const processChunk = (start) => {
     if (isTimedOut) {
-      // Якщо таймаут спрацював, не починамо обробку нового чанку
       return;
     }
     const readStream = fs.createReadStream(inputFilePath, {
@@ -91,7 +89,6 @@ const processData = async (data) => {
       .pipe(writeStream)
       .on("finish", async () => {
         const newPosition = start + CHUNK_SIZE;
-        // Перевіряємо, чи завершили обробку
         if (newPosition >= fs.statSync(inputFilePath).size) {
           Redis.put(statusKey, constants.status.completed);
           Redis.remove(retryKey);
@@ -164,3 +161,5 @@ try {
 } catch (error) {
   parentPort.postMessage({ error: error.message });
 }
+
+module.exports = { processData };

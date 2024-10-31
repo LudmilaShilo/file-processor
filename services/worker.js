@@ -4,10 +4,8 @@ const path = require("path");
 exports.processTask = async (job) => {
   return new Promise((resolve, reject) => {
     const worker = new Worker(path.resolve(__dirname, "taskWorker.js"), {
-      workerData: job.data, // job.data = { task, fileName, userId }
+      workerData: job.data,
     });
-
-    const { task, fileName, userId } = job.data;
 
     worker.on("message", (result) => {
       resolve(result);

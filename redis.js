@@ -2,14 +2,14 @@ const Redis = require("ioredis");
 require("./config");
 
 const client = new Redis({
-  host: process.env.REDIS_MAIN_HOST || "localhost",
+  host: process.env.REDIS_MAIN_HOST || "redis1",
   port: process.env.REDIS_MAIN_PORT || 6379,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
 });
 
 const clientQueue = new Redis({
-  host: process.env.REDIS_Queue_HOST || "localhost",
+  host: process.env.REDIS_Queue_HOST || "redis2",
   port: process.env.REDIS_Queue_PORT || 6380,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
@@ -31,7 +31,7 @@ const get = async (key) => {
     return value ? JSON.parse(value) : null;
   } catch (err) {
     console.warn("Error getting value from Redis:", err);
-    return null; // Повертаємо null у випадку помилки
+    return null;
   }
 };
 
@@ -52,7 +52,6 @@ const remove = async (key) => {
   }
 };
 
-// Експортуємо client та функції
 module.exports = {
   client,
   clientQueue,
