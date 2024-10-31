@@ -1,7 +1,6 @@
 const Redis = require("ioredis");
 require("./config");
 
-// Ініціалізація Redis-клієнта
 const client = new Redis({
   host: process.env.REDIS_MAIN_HOST || "localhost",
   port: process.env.REDIS_MAIN_PORT || 6379,
@@ -18,7 +17,6 @@ const clientQueue = new Redis({
 
 console.log("Redis start");
 
-// Обробка помилок підключення
 client.on("error", (err) => {
   if (err.code === "ECONNREFUSED") {
     console.error("Redis is not available");
@@ -27,11 +25,10 @@ client.on("error", (err) => {
   console.error("Redis error", err);
 });
 
-// Експорт функцій для роботи з Redis
 const get = async (key) => {
   try {
     const value = await client.get(key);
-    return value ? JSON.parse(value) : null; // Додаємо перевірку на null
+    return value ? JSON.parse(value) : null;
   } catch (err) {
     console.warn("Error getting value from Redis:", err);
     return null; // Повертаємо null у випадку помилки
@@ -46,10 +43,20 @@ const put = async (key, value) => {
   }
 };
 
+const remove = async (key) => {
+  try {
+    await client.del(key);
+    console.log(`Key ${key} deleted from Redis`);
+  } catch (err) {
+    console.warn("Error deleting value in Redis:", err);
+  }
+};
+
 // Експортуємо client та функції
 module.exports = {
   client,
-  clientQueue, // Експортуємо клієнта
-  get, // Експортуємо функцію get
-  put, // Експортуємо функцію put
+  clientQueue,
+  get,
+  put,
+  remove,
 };

@@ -2,7 +2,7 @@ require("../config.js");
 const multer = require("multer");
 const fs = require("fs");
 
-const fileSizeInMB = parseInt(process.env.fileSizeInMB, 10);
+const FILE_SIZE_MB = parseInt(process.env.FILE_SIZE_MB, 10);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: fileSizeInMB * 1024 * 1024 },
+  limits: { fileSize: FILE_SIZE_MB * 1024 * 1024 },
 }).single("file");
 
 const uploadFilePromise = (req, res) => {
@@ -36,7 +36,7 @@ const uploadFilePromise = (req, res) => {
 
 multer({
   storage,
-  limits: { fileSize: fileSizeInMB * 1024 * 1024 },
+  limits: { fileSize: FILE_SIZE_MB * 1024 * 1024 },
 }).single("file");
 
 module.exports = uploadFilePromise;

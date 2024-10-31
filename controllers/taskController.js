@@ -5,7 +5,6 @@ const File = require("../models/fileModel.js");
 const Redis = require("../redis.js");
 const tasksQueue = require("../queue.js");
 const getFileStream = require("../unit/getFileStream.js");
-const path = require("path");
 const fs = require("fs");
 
 const isProcessingSupported = (task) => {
@@ -48,7 +47,7 @@ const create = catchAsync(async (req, res, next) => {
     constants.status.pending
   );
 
-  await tasksQueue.add({ task, fileName, userId });
+  tasksQueue.add({ task, fileName, userId });
   res.status(200).json({
     status: "success",
   });
