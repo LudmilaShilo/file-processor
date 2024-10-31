@@ -8,19 +8,19 @@ This project is a file processing system that allows users to upload files, proc
 
 To run the system locally, please follow these steps:
 
-1. Clone the Project from Git
+1. Clone the Project from Git and cd into
 
-   git clone `repository-url`
+   git clone https://github.com/LudmilaShilo/file-processor
 
-   cd `project-directory`
+   cd file-processor
 
-2. Install Dependencies
+2. Install the Dependencies assume a node ecosystem already install
 
    npm install
 
-3. Create a Development Environment File
+3. Create the Development Environment File
 
-Create a file named `.env.development` and copy the values from `.env.example` into it.
+   cp .env.example .env.development
 
 4. Start Redis and MongoDB
 
@@ -39,6 +39,10 @@ Start the project using:
 To execute the tests, use:
 
     npm run test
+
+7. Please find the usage documentation on this link:
+
+<https://www.postman.com/planetary-crescent-498171/workspace/file-processing-project/collection/6557541-9e307539-f742-4403-8941-60bc56abd4b3?action=share&creator=6557541>
 
 License
 
