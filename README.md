@@ -42,7 +42,7 @@ To execute the tests, use:
 
 7. Please find the usage documentation on this link:
 
-<https://www.postman.com/planetary-crescent-498171/workspace/file-processing-project/collection/6557541-9e307539-f742-4403-8941-60bc56abd4b3?action=share&creator=6557541>
+<https://www.postman.com/ludmilashilo/file-processor>
 
 License
 

@@ -38,21 +38,10 @@ const processData = async (data) => {
   const retry = await Redis.get(retryKey);
   let attempts = retry ? JSON.parse(retry).attempts : 0;
   const start = retry ? JSON.parse(retry).position : 0;
-  const startProcess = Date.now();
-  console.log("process start at ms ", startProcess);
-  console.log("attempts", attempts);
-  console.log("processChunk start with position", start);
 
   if (attempts >= MAX_ATTEMPTS) {
     Redis.put(statusKey, constants.status.failed);
     Redis.remove(retryKey);
-    const finishProcess = Date.now();
-    console.log(
-      "process finish at ms ",
-      finishProcess,
-      "common time in ms ",
-      finishProcess - startProcess
-    );
     parentPort.postMessage({ error: "Maximum attempts reached" });
     return;
   }
@@ -73,10 +62,10 @@ const processData = async (data) => {
       end: start + CHUNK_SIZE - 1,
     });
     const transformStream = new Transform({
-      async transform(chunk, encoding, callback) {
+      transform(chunk, encoding, callback) {
         const chunkString = chunk.toString();
         if (constants.taskHandlers[task]) {
-          const result = await constants.taskHandlers[task](chunkString);
+          const result = constants.taskHandlers[task](chunkString);
           callback(null, result);
         } else {
           callback(new Error("Unknown task"));
@@ -101,13 +90,6 @@ const processData = async (data) => {
               })}\n\n`
             );
           }
-          const finishProcess = Date.now();
-          console.log(
-            "process finish at ms ",
-            finishProcess,
-            "common time in ms ",
-            finishProcess - startProcess
-          );
           parentPort.postMessage({
             status: "completed",
             message: "File processed successfully.",
@@ -118,17 +100,8 @@ const processData = async (data) => {
             JSON.stringify({ attempts: attempts + 1, position: newPosition })
           );
           Redis.put(statusKey, constants.status.incomplete);
-          const finishProcess = Date.now();
-          console.log(
-            "process finish at ms ",
-            finishProcess,
-            "common time in ms ",
-            finishProcess - startProcess
-          );
           parentPort.postMessage({ error: "Task timed out" });
           await queue.add({ userId, fileName, task });
-          const jobCounts = await queue.getJobCounts();
-          console.log("Job Counts:", jobCounts);
         } else {
           processChunk(newPosition);
         }
@@ -140,26 +113,13 @@ const processData = async (data) => {
         );
         Redis.put(statusKey, constants.status.incomplete);
         queue.add({ userId, fileName, task });
-        const finishProcess = Date.now();
         parentPort.postMessage({ error: error.message });
-        console.log(
-          "process finish at ms ",
-          finishProcess,
-          "common time in ms ",
-          finishProcess - startProcess
-        );
-        const jobCounts = await queue.getJobCounts();
-        console.log("Job Counts:", jobCounts);
       });
   };
 
   processChunk(start);
 };
 
-try {
-  processData(workerData);
-} catch (error) {
-  parentPort.postMessage({ error: error.message });
-}
+processData(workerData);
 
 module.exports = { processData };

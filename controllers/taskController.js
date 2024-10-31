@@ -72,7 +72,6 @@ const returnResult = catchAsync(async (req, res, next) => {
     );
   }
   const fileStream = getFileStream({ userId, fileName, task });
-  res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
   res.setHeader("Content-Type", "application/octet-stream");
   fileStream.pipe(res);
   return;

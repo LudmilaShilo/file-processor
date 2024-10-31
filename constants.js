@@ -9,14 +9,8 @@ const tasks = {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const taskHandlers = {
-  task1: async (chunk) => {
-    await delay(10);
-    chunk.toUpperCase();
-  },
-  task2: async (chunk) => {
-    await delay(10);
-    chunk.toLowerCase();
-  },
+  task1: (chunk) => chunk.toUpperCase(),
+  task2: (chunk) => chunk.toLowerCase(),
 };
 
 module.exports = taskHandlers;
