@@ -10,8 +10,9 @@ To run the system locally, please follow these steps:
 
 1. Clone the Project from Git
 
-   git clone <repository-url>
-   cd <project-directory>
+   git clone `repository-url`
+
+   cd `project-directory`
 
 2. Install Dependencies
 
