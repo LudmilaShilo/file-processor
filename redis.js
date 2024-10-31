@@ -2,14 +2,14 @@ const Redis = require("ioredis");
 require("./config");
 
 const client = new Redis({
-  host: process.env.REDIS_MAIN_HOST || "redis1",
+  host: process.env.REDIS_MAIN_HOST || "localhost",
   port: process.env.REDIS_MAIN_PORT || 6379,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
 });
 
 const clientQueue = new Redis({
-  host: process.env.REDIS_Queue_HOST || "redis2",
+  host: process.env.REDIS_Queue_HOST || "localhost",
   port: process.env.REDIS_Queue_PORT || 6380,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
