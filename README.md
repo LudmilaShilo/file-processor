@@ -19,13 +19,13 @@ To run the system locally, please follow these steps:
 
 3. Create a Development Environment File
 
-Create a file named .env.development and copy the values from .env.example into it.
+Create a file named `.env.development` and copy the values from `.env.example` into it.
 
 4. Start Redis and MongoDB
 
 Use Docker to run Redis and MongoDB with the following command:
 
-docker-compose -f docker-compose-dev.yml up --build -d
+    docker-compose -f docker-compose-dev.yml up --build -d
 
 5. Run the Project
 
