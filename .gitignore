@@ -3,4 +3,3 @@ node_modules
 !*.example
 .cache
 .idea
-fileStorage
